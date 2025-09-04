@@ -172,6 +172,50 @@ async def list_tools() -> list[types.Tool]:
                 "properties": {},
                 "additionalProperties": False
             }
+        ),
+        types.Tool(
+            name="picotool_partition_info",
+            description="Get partition table information from RP2350 devices (RP2040 devices don't have partition tables)",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "family_id": {
+                        "type": "string",
+                        "description": "Target family ID to show partition for (e.g. 'rp2350-arm-s', 'rp2350-riscv')"
+                    },
+                    "force": {
+                        "type": "boolean",
+                        "description": "Force device not in BOOTSEL mode to reset",
+                        "default": False
+                    },
+                    "force_no_reboot": {
+                        "type": "boolean",
+                        "description": "Force device reset but don't reboot back",
+                        "default": False
+                    },
+                    "bus": {
+                        "type": "string",
+                        "description": "Filter devices by USB bus number"
+                    },
+                    "address": {
+                        "type": "string",
+                        "description": "Filter devices by USB device address"
+                    },
+                    "vid": {
+                        "type": "string",
+                        "description": "Filter by vendor ID"
+                    },
+                    "pid": {
+                        "type": "string",
+                        "description": "Filter by product ID"
+                    },
+                    "serial": {
+                        "type": "string",
+                        "description": "Filter by serial number"
+                    }
+                },
+                "additionalProperties": False
+            }
         )
     ]
 
@@ -274,6 +318,37 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> Sequence[typ
             
         except Exception as e:
             error_msg = f"Error running picotool version: {str(e)}"
+            logger.error(error_msg)
+            return [types.TextContent(type="text", text=error_msg)]
+    
+    elif name == "picotool_partition_info":
+        try:
+            family_id = arguments.get("family_id")
+            force = arguments.get("force", False)
+            force_no_reboot = arguments.get("force_no_reboot", False)
+            bus = arguments.get("bus")
+            address = arguments.get("address")
+            vid = arguments.get("vid")
+            pid = arguments.get("pid")
+            serial = arguments.get("serial")
+            
+            logger.info(f"Running picotool partition info with options={arguments}")
+            
+            result = await picotool.partition_info(
+                family_id=family_id,
+                force=force,
+                force_no_reboot=force_no_reboot,
+                bus=bus,
+                address=address,
+                vid=vid,
+                pid=pid,
+                serial=serial
+            )
+            
+            return [types.TextContent(type="text", text=result)]
+            
+        except Exception as e:
+            error_msg = f"Error running picotool partition info: {str(e)}"
             logger.error(error_msg)
             return [types.TextContent(type="text", text=error_msg)]
     

@@ -214,3 +214,55 @@ class PicotoolWrapper:
             Version string from picotool
         """
         return await self._run_command(["version"])
+    
+    async def partition_info(
+        self,
+        family_id: Optional[str] = None,
+        force: bool = False,
+        force_no_reboot: bool = False,
+        bus: Optional[str] = None,
+        address: Optional[str] = None,
+        vid: Optional[str] = None,
+        pid: Optional[str] = None,
+        serial: Optional[str] = None
+    ) -> str:
+        """Get partition table information from RP2350 device.
+        
+        Args:
+            family_id: Target family ID to show partition for (e.g. 'rp2350-arm-s')
+            force: Force device not in BOOTSEL mode to reset
+            force_no_reboot: Force device reset but don't reboot back
+            bus: Filter devices by USB bus number
+            address: Filter devices by USB device address
+            vid: Filter by vendor ID
+            pid: Filter by product ID
+            serial: Filter by serial number
+            
+        Returns:
+            Partition table information from picotool
+        """
+        args = ["partition", "info"]
+        
+        # Add family ID if specified
+        if family_id:
+            args.extend(["-m", family_id])
+        
+        # Add device selection options
+        if bus:
+            args.extend(["--bus", bus])
+        if address:
+            args.extend(["--address", address])
+        if vid:
+            args.extend(["--vid", vid])
+        if pid:
+            args.extend(["--pid", pid])
+        if serial:
+            args.extend(["--ser", serial])
+        
+        # Add force options (must be last)
+        if force:
+            args.append("-f")
+        elif force_no_reboot:
+            args.append("-F")
+        
+        return await self._run_command(args)

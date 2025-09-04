@@ -14,6 +14,7 @@ An MCP (Model Context Protocol) server that provides Claude Code with capabiliti
 - 🔄 **Device Reboot**: Reboot devices between application and BOOTSEL modes programmatically
 - 🎯 **Device Selection**: Filter devices by USB bus, address, VID/PID, or serial number
 - 🔧 **Version Checking**: Get picotool version information for troubleshooting
+- 🗂️ **Partition Management**: View RP2350 partition table information and layout
 - 🏛️ **Multi-Architecture**: Support for ARM and RISC-V cores on RP2350 devices
 - ⚡ **Fast Integration**: Built with `uv` for lightning-fast dependency management
 - 🛡️ **Robust Error Handling**: Graceful handling of disconnected devices and file errors
@@ -250,6 +251,59 @@ This tool takes no parameters - it simply returns the installed picotool version
 
 ```
 picotool v2.0.0 (d4c9a39)
+```
+
+### `picotool_partition_info`
+
+Get partition table information from RP2350 devices. RP2040 devices don't have partition tables.
+
+#### Parameters
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `family_id` | string | Target family ID to show partition for (e.g. 'rp2350-arm-s', 'rp2350-riscv') | - |
+| `force` | boolean | Force device not in BOOTSEL mode to reset | `false` |
+| `force_no_reboot` | boolean | Force device reset but don't reboot back | `false` |
+| `bus` | string | Filter devices by USB bus number | - |
+| `address` | string | Filter devices by USB device address | - |
+| `vid` | string | Filter by vendor ID | - |
+| `pid` | string | Filter by product ID | - |
+| `serial` | string | Filter by serial number | - |
+
+#### Examples
+
+**Get full partition table:**
+```json
+{}
+```
+
+**Show partition info for ARM secure family:**
+```json
+{
+  "family_id": "rp2350-arm-s"
+}
+```
+
+**Force a running device to show partition info:**
+```json
+{
+  "force": true
+}
+```
+
+#### Sample Output
+
+```
+un-partitioned_space :  S(rw) NSBOOT(rw) NS(rw), uf2 { absolute }
+partitions:
+  0(A)       00002000->00201000 S(rw) NSBOOT(rw) NS(rw), id=0000000000000000, "A", uf2 { rp2350-arm-s, rp2350-riscv }, arm_boot 1, riscv_boot 1
+  1(B w/ 0)  00201000->00400000 S(rw) NSBOOT(rw) NS(rw), id=0000000000000001, "B", uf2 { rp2350-arm-s, rp2350-riscv }, arm_boot 1, riscv_boot 1
+```
+
+**With family ID specified:**
+```
+Family ID 'rp2350-arm-s' can be downloaded in partition 0:
+  00002000->00201000
 ```
 
 ## 📋 Supported Devices
