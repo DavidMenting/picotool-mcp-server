@@ -163,6 +163,15 @@ async def list_tools() -> list[types.Tool]:
                 },
                 "additionalProperties": False
             }
+        ),
+        types.Tool(
+            name="picotool_version",
+            description="Get picotool version information for troubleshooting and diagnostics",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+                "additionalProperties": False
+            }
         )
     ]
 
@@ -252,6 +261,19 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> Sequence[typ
             
         except Exception as e:
             error_msg = f"Error running picotool reboot: {str(e)}"
+            logger.error(error_msg)
+            return [types.TextContent(type="text", text=error_msg)]
+    
+    elif name == "picotool_version":
+        try:
+            logger.info("Running picotool version")
+            
+            result = await picotool.version()
+            
+            return [types.TextContent(type="text", text=result)]
+            
+        except Exception as e:
+            error_msg = f"Error running picotool version: {str(e)}"
             logger.error(error_msg)
             return [types.TextContent(type="text", text=error_msg)]
     

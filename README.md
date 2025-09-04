@@ -13,6 +13,7 @@ An MCP (Model Context Protocol) server that provides Claude Code with capabiliti
 - 🧩 **Pin Mapping**: Extract pin assignment information from firmware
 - 🔄 **Device Reboot**: Reboot devices between application and BOOTSEL modes programmatically
 - 🎯 **Device Selection**: Filter devices by USB bus, address, VID/PID, or serial number
+- 🔧 **Version Checking**: Get picotool version information for troubleshooting
 - 🏛️ **Multi-Architecture**: Support for ARM and RISC-V cores on RP2350 devices
 - ⚡ **Fast Integration**: Built with `uv` for lightning-fast dependency management
 - 🛡️ **Robust Error Handling**: Graceful handling of disconnected devices and file errors
@@ -229,6 +230,26 @@ Reboot connected Pico devices to application mode or BOOTSEL mode for developmen
   "cpu": "RISC-V",
   "usb_mass_storage": true
 }
+```
+
+### `picotool_version`
+
+Get picotool version information for troubleshooting and diagnostics.
+
+#### Parameters
+
+This tool takes no parameters - it simply returns the installed picotool version.
+
+#### Example
+
+```json
+{}
+```
+
+#### Sample Output
+
+```
+picotool v2.0.0 (d4c9a39)
 ```
 
 ## 📋 Supported Devices
