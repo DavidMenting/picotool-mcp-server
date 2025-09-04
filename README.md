@@ -11,6 +11,8 @@ An MCP (Model Context Protocol) server that provides Claude Code with capabiliti
 - 🔍 **Device Information**: Query connected Pico devices for detailed hardware and firmware info
 - 📁 **Binary Analysis**: Analyze UF2, ELF, and BIN files without flashing to device
 - 🧩 **Pin Mapping**: Extract pin assignment information from firmware
+- 🔄 **Force Reboot**: Force running devices into BOOTSEL mode without physical button press
+- 🎯 **Device Selection**: Filter devices by USB bus, address, VID/PID, or serial number
 - ⚡ **Fast Integration**: Built with `uv` for lightning-fast dependency management
 - 🛡️ **Robust Error Handling**: Graceful handling of disconnected devices and file errors
 - 📊 **Comprehensive Data**: Access to device info, build metadata, memory layout, and more
@@ -87,6 +89,13 @@ Get comprehensive information about connected Pico devices or analyze binary fil
 | `debug` | boolean | Include device debug information | `false` |
 | `build` | boolean | Include build attributes | `false` |
 | `all` | boolean | Include all information | `false` |
+| `force` | boolean | Force device not in BOOTSEL mode to reset and execute command | `false` |
+| `force_no_reboot` | boolean | Force device reset but don't reboot back to application mode | `false` |
+| `bus` | string | Filter devices by USB bus number | - |
+| `address` | string | Filter devices by USB device address | - |
+| `vid` | string | Filter by vendor ID | - |
+| `pid` | string | Filter by product ID | - |
+| `serial` | string | Filter by serial number | - |
 
 #### Examples
 
@@ -110,6 +119,23 @@ Get comprehensive information about connected Pico devices or analyze binary fil
   "target": "/path/to/firmware.uf2",
   "pins": true,
   "build": true
+}
+```
+
+**Force a running device to provide info (useful for development):**
+```json
+{
+  "force": true,
+  "all": true
+}
+```
+
+**Query a specific device by serial number:**
+```json
+{
+  "serial": "20C110CE49017709",
+  "device": true,
+  "pins": true
 }
 ```
 

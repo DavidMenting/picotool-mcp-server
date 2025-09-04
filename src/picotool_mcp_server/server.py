@@ -70,6 +70,36 @@ async def list_tools() -> list[types.Tool]:
                         "type": "boolean",
                         "description": "Include all information",
                         "default": False
+                    },
+                    "force": {
+                        "type": "boolean",
+                        "description": "Force device not in BOOTSEL mode to reset and execute command",
+                        "default": False
+                    },
+                    "force_no_reboot": {
+                        "type": "boolean", 
+                        "description": "Force device reset but don't reboot back to application mode",
+                        "default": False
+                    },
+                    "bus": {
+                        "type": "string",
+                        "description": "Filter devices by USB bus number"
+                    },
+                    "address": {
+                        "type": "string", 
+                        "description": "Filter devices by USB device address"
+                    },
+                    "vid": {
+                        "type": "string",
+                        "description": "Filter by vendor ID"
+                    },
+                    "pid": {
+                        "type": "string",
+                        "description": "Filter by product ID" 
+                    },
+                    "serial": {
+                        "type": "string",
+                        "description": "Filter by serial number"
                     }
                 },
                 "additionalProperties": False
@@ -94,6 +124,13 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> Sequence[typ
             debug = arguments.get("debug", False)
             build = arguments.get("build", False)
             all_info = arguments.get("all", False)
+            force = arguments.get("force", False)
+            force_no_reboot = arguments.get("force_no_reboot", False)
+            bus = arguments.get("bus")
+            address = arguments.get("address")
+            vid = arguments.get("vid") 
+            pid = arguments.get("pid")
+            serial = arguments.get("serial")
             
             logger.info(f"Running picotool info with target='{target}', options={arguments}")
             
@@ -105,7 +142,14 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> Sequence[typ
                 device=device,
                 debug=debug,
                 build=build,
-                all=all_info
+                all=all_info,
+                force=force,
+                force_no_reboot=force_no_reboot,
+                bus=bus,
+                address=address,
+                vid=vid,
+                pid=pid,
+                serial=serial
             )
             
             return [types.TextContent(type="text", text=result)]
