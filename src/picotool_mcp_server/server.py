@@ -104,6 +104,65 @@ async def list_tools() -> list[types.Tool]:
                 },
                 "additionalProperties": False
             }
+        ),
+        types.Tool(
+            name="picotool_reboot",
+            description="Reboot connected Pico devices to application or BOOTSEL mode",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "all_devices": {
+                        "type": "boolean",
+                        "description": "Reboot all connected devices",
+                        "default": False
+                    },
+                    "usb_mass_storage": {
+                        "type": "boolean",
+                        "description": "Reboot to USB mass storage mode (BOOTSEL)",
+                        "default": False
+                    },
+                    "partition": {
+                        "type": "string",
+                        "description": "Reboot to a specific partition"
+                    },
+                    "cpu": {
+                        "type": "string",
+                        "description": "Specify which CPU to boot (ARM/RISC-V for RP2350)",
+                        "enum": ["ARM", "RISC-V"]
+                    },
+                    "force": {
+                        "type": "boolean",
+                        "description": "Force device not in BOOTSEL mode to reset",
+                        "default": False
+                    },
+                    "force_no_reboot": {
+                        "type": "boolean",
+                        "description": "Force device reset but don't reboot back",
+                        "default": False
+                    },
+                    "bus": {
+                        "type": "string",
+                        "description": "Filter devices by USB bus number"
+                    },
+                    "address": {
+                        "type": "string",
+                        "description": "Filter devices by USB device address"
+                    },
+                    "vid": {
+                        "type": "string",
+                        "description": "Filter by vendor ID"
+                    },
+                    "pid": {
+                        "type": "string",
+                        "description": "Filter by product ID"
+                    },
+                    "serial": {
+                        "type": "string",
+                        "description": "Filter by serial number"
+                    }
+                },
+                "additionalProperties": False
+            }
         )
     ]
 
@@ -158,6 +217,44 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> Sequence[typ
             error_msg = f"Error running picotool info: {str(e)}"
             logger.error(error_msg)
             return [types.TextContent(type="text", text=error_msg)]
+    
+    elif name == "picotool_reboot":
+        try:
+            all_devices = arguments.get("all_devices", False)
+            usb_mass_storage = arguments.get("usb_mass_storage", False)
+            partition = arguments.get("partition")
+            cpu = arguments.get("cpu")
+            force = arguments.get("force", False)
+            force_no_reboot = arguments.get("force_no_reboot", False)
+            bus = arguments.get("bus")
+            address = arguments.get("address")
+            vid = arguments.get("vid")
+            pid = arguments.get("pid")
+            serial = arguments.get("serial")
+            
+            logger.info(f"Running picotool reboot with options={arguments}")
+            
+            result = await picotool.reboot(
+                all_devices=all_devices,
+                usb_mass_storage=usb_mass_storage,
+                partition=partition,
+                cpu=cpu,
+                force=force,
+                force_no_reboot=force_no_reboot,
+                bus=bus,
+                address=address,
+                vid=vid,
+                pid=pid,
+                serial=serial
+            )
+            
+            return [types.TextContent(type="text", text=result)]
+            
+        except Exception as e:
+            error_msg = f"Error running picotool reboot: {str(e)}"
+            logger.error(error_msg)
+            return [types.TextContent(type="text", text=error_msg)]
+    
     else:
         raise ValueError(f"Unknown tool: {name}")
 

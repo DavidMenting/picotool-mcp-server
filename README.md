@@ -11,8 +11,9 @@ An MCP (Model Context Protocol) server that provides Claude Code with capabiliti
 - 🔍 **Device Information**: Query connected Pico devices for detailed hardware and firmware info
 - 📁 **Binary Analysis**: Analyze UF2, ELF, and BIN files without flashing to device
 - 🧩 **Pin Mapping**: Extract pin assignment information from firmware
-- 🔄 **Force Reboot**: Force running devices into BOOTSEL mode without physical button press
+- 🔄 **Device Reboot**: Reboot devices between application and BOOTSEL modes programmatically
 - 🎯 **Device Selection**: Filter devices by USB bus, address, VID/PID, or serial number
+- 🏛️ **Multi-Architecture**: Support for ARM and RISC-V cores on RP2350 devices
 - ⚡ **Fast Integration**: Built with `uv` for lightning-fast dependency management
 - 🛡️ **Robust Error Handling**: Graceful handling of disconnected devices and file errors
 - 📊 **Comprehensive Data**: Access to device info, build metadata, memory layout, and more
@@ -162,6 +163,64 @@ Partition 1
   revision:      A2
   flash size:    16384K
   current cpu:   ARM
+```
+
+### `picotool_reboot`
+
+Reboot connected Pico devices to application mode or BOOTSEL mode for development workflows.
+
+#### Parameters
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `all_devices` | boolean | Reboot all connected devices | `false` |
+| `usb_mass_storage` | boolean | Reboot to USB mass storage mode (BOOTSEL) | `false` |
+| `partition` | string | Reboot to a specific partition | - |
+| `cpu` | string | Specify which CPU to boot (ARM/RISC-V for RP2350) | - |
+| `force` | boolean | Force device not in BOOTSEL mode to reset | `false` |
+| `force_no_reboot` | boolean | Force device reset but don't reboot back | `false` |
+| `bus` | string | Filter devices by USB bus number | - |
+| `address` | string | Filter devices by USB device address | - |
+| `vid` | string | Filter by vendor ID | - |
+| `pid` | string | Filter by product ID | - |
+| `serial` | string | Filter by serial number | - |
+
+#### Examples
+
+**Reboot to BOOTSEL mode (for firmware flashing):**
+```json
+{
+  "usb_mass_storage": true,
+  "force": true
+}
+```
+
+**Reboot back to application mode:**
+```json
+{}
+```
+
+**Reboot all connected devices:**
+```json
+{
+  "all_devices": true
+}
+```
+
+**Reboot to specific partition (RP2350):**
+```json
+{
+  "partition": "1",
+  "force": true
+}
+```
+
+**Reboot with specific CPU (RP2350):**
+```json
+{
+  "cpu": "RISC-V",
+  "usb_mass_storage": true
+}
 ```
 
 ## 📋 Supported Devices
