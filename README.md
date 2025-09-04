@@ -76,7 +76,7 @@ uv run python -m picotool_mcp_server
 
 ### `picotool_info`
 
-Get comprehensive information about connected Pico devices or analyze binary files.
+Get comprehensive information about connected Pico devices or analyze binary files. **Can automatically force running devices into BOOTSEL mode** - no physical button press required!
 
 #### Parameters
 
@@ -90,7 +90,7 @@ Get comprehensive information about connected Pico devices or analyze binary fil
 | `debug` | boolean | Include device debug information | `false` |
 | `build` | boolean | Include build attributes | `false` |
 | `all` | boolean | Include all information | `false` |
-| `force` | boolean | Force device not in BOOTSEL mode to reset and execute command | `false` |
+| `force` | boolean | **Auto-reboot running device to BOOTSEL mode** (no physical button needed) | `false` |
 | `force_no_reboot` | boolean | Force device reset but don't reboot back to application mode | `false` |
 | `bus` | string | Filter devices by USB bus number | - |
 | `address` | string | Filter devices by USB device address | - |
@@ -100,7 +100,15 @@ Get comprehensive information about connected Pico devices or analyze binary fil
 
 #### Examples
 
-**Get basic info from connected device:**
+**Auto-detect running device and get info (most common use case):**
+```json
+{
+  "force": true,
+  "all": true
+}
+```
+
+**Get basic info from device already in BOOTSEL mode:**
 ```json
 {
   "basic": true

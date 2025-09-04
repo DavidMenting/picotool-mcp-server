@@ -27,7 +27,7 @@ async def list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="picotool_info",
-            description="Get information about connected Pico devices or binary files",
+            description="Get information about connected Pico devices or binary files. Can force running devices into BOOTSEL mode automatically.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -73,7 +73,7 @@ async def list_tools() -> list[types.Tool]:
                     },
                     "force": {
                         "type": "boolean",
-                        "description": "Force device not in BOOTSEL mode to reset and execute command",
+                        "description": "Force running device to reboot into BOOTSEL mode automatically (no physical button needed)",
                         "default": False
                     },
                     "force_no_reboot": {
