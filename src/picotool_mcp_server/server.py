@@ -216,6 +216,63 @@ async def list_tools() -> list[types.Tool]:
                 },
                 "additionalProperties": False
             }
+        ),
+        types.Tool(
+            name="picotool_erase",
+            description="Erase flash memory on connected Pico devices. CAUTION: This operation is destructive and will permanently delete data.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "all_flash": {
+                        "type": "boolean",
+                        "description": "Erase all flash memory on the device",
+                        "default": False
+                    },
+                    "sector": {
+                        "type": "string",
+                        "description": "Erase specific sector (hex address, e.g. '0x10000000')"
+                    },
+                    "range_start": {
+                        "type": "string",
+                        "description": "Start address for range erase (hex, e.g. '0x10000000')"
+                    },
+                    "range_end": {
+                        "type": "string",
+                        "description": "End address for range erase (hex, e.g. '0x10100000')"
+                    },
+                    "force": {
+                        "type": "boolean",
+                        "description": "Force device not in BOOTSEL mode to reset",
+                        "default": False
+                    },
+                    "force_no_reboot": {
+                        "type": "boolean",
+                        "description": "Force device reset but don't reboot back",
+                        "default": False
+                    },
+                    "bus": {
+                        "type": "string",
+                        "description": "Filter devices by USB bus number"
+                    },
+                    "address": {
+                        "type": "string",
+                        "description": "Filter devices by USB device address"
+                    },
+                    "vid": {
+                        "type": "string",
+                        "description": "Filter by vendor ID"
+                    },
+                    "pid": {
+                        "type": "string",
+                        "description": "Filter by product ID"
+                    },
+                    "serial": {
+                        "type": "string",
+                        "description": "Filter by serial number"
+                    }
+                },
+                "additionalProperties": False
+            }
         )
     ]
 
@@ -349,6 +406,43 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> Sequence[typ
             
         except Exception as e:
             error_msg = f"Error running picotool partition info: {str(e)}"
+            logger.error(error_msg)
+            return [types.TextContent(type="text", text=error_msg)]
+    
+    elif name == "picotool_erase":
+        try:
+            all_flash = arguments.get("all_flash", False)
+            sector = arguments.get("sector")
+            range_start = arguments.get("range_start")
+            range_end = arguments.get("range_end")
+            force = arguments.get("force", False)
+            force_no_reboot = arguments.get("force_no_reboot", False)
+            bus = arguments.get("bus")
+            address = arguments.get("address")
+            vid = arguments.get("vid")
+            pid = arguments.get("pid")
+            serial = arguments.get("serial")
+            
+            logger.info(f"Running picotool erase with options={arguments}")
+            
+            result = await picotool.erase(
+                all_flash=all_flash,
+                sector=sector,
+                range_start=range_start,
+                range_end=range_end,
+                force=force,
+                force_no_reboot=force_no_reboot,
+                bus=bus,
+                address=address,
+                vid=vid,
+                pid=pid,
+                serial=serial
+            )
+            
+            return [types.TextContent(type="text", text=result)]
+            
+        except Exception as e:
+            error_msg = f"Error running picotool erase: {str(e)}"
             logger.error(error_msg)
             return [types.TextContent(type="text", text=error_msg)]
     
