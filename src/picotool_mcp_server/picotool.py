@@ -266,3 +266,67 @@ class PicotoolWrapper:
             args.append("-F")
         
         return await self._run_command(args)
+    
+    async def erase(
+        self,
+        all_flash: bool = False,
+        sector: Optional[str] = None,
+        range_start: Optional[str] = None,
+        range_end: Optional[str] = None,
+        force: bool = False,
+        force_no_reboot: bool = False,
+        bus: Optional[str] = None,
+        address: Optional[str] = None,
+        vid: Optional[str] = None,
+        pid: Optional[str] = None,
+        serial: Optional[str] = None
+    ) -> str:
+        """Erase flash memory on connected Pico device.
+        
+        Args:
+            all_flash: Erase all flash memory
+            sector: Erase specific sector (hex address)
+            range_start: Start address for range erase (hex)
+            range_end: End address for range erase (hex)
+            force: Force device not in BOOTSEL mode to reset
+            force_no_reboot: Force device reset but don't reboot back
+            bus: Filter devices by USB bus number
+            address: Filter devices by USB device address
+            vid: Filter by vendor ID
+            pid: Filter by product ID
+            serial: Filter by serial number
+            
+        Returns:
+            Erase command output from picotool
+        """
+        args = ["erase"]
+        
+        # Add erase options
+        if all_flash:
+            args.append("--all")
+        elif sector:
+            args.extend(["--sector", sector])
+        elif range_start and range_end:
+            args.extend(["--range", f"{range_start}:{range_end}"])
+        elif range_start or range_end:
+            raise PicotoolError("Both range_start and range_end must be specified for range erase")
+        
+        # Add device selection options
+        if bus:
+            args.extend(["--bus", bus])
+        if address:
+            args.extend(["--address", address])
+        if vid:
+            args.extend(["--vid", vid])
+        if pid:
+            args.extend(["--pid", pid])
+        if serial:
+            args.extend(["--ser", serial])
+        
+        # Add force options (must be last)
+        if force:
+            args.append("-f")
+        elif force_no_reboot:
+            args.append("-F")
+        
+        return await self._run_command(args)
